@@ -1,0 +1,15 @@
+{
+  "games": [
+    {
+      "id": 1,
+      "title": "گرنی",
+      "description": "",
+      "image_url": "https://mamaddevil.github.io/gamemamad/images/ChatGPT_Image_________________________.png",
+      "play_url": "https://preview-chat-3dfa7739-fba7-4aa5-9a2d-51f9dad765f2.space-z.ai/",
+      "download_url": "",
+      "file_size": "",
+      "version": "1.0",
+      "status": 1
+    }
+  ]
+}
