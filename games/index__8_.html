@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+<title>Counter-Strike Web — Dust II</title>
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div id="app">
+  <!-- ============ 3D viewport ============ -->
+  <canvas id="gl"></canvas>
+
+  <!-- ============ HUD ============ -->
+  <div id="hud" class="hidden">
+    <div id="topbar">
+      <div class="team-score t"><span id="scoreT">0</span></div>
+      <div id="roundinfo">
+        <div id="roundtimer">1:55</div>
+        <div id="roundnum">ROUND 1/30</div>
+        <div id="bombstate"></div>
+      </div>
+      <div class="team-score ct"><span id="scoreCT">0</span></div>
+    </div>
+
+    <div id="radarWrap">
+      <canvas id="radar" width="200" height="200"></canvas>
+      <div id="calloutLabel"></div>
+    </div>
+
+    <div id="money">$800</div>
+
+    <div id="killfeed"></div>
+
+    <div id="bottomleft">
+      <div id="healthRow"><span class="ico">&#10010;</span><span id="health">100</span></div>
+      <div id="armorRow"><span class="ico">&#9978;</span><span id="armor">0</span></div>
+    </div>
+
+    <div id="bottomright">
+      <div id="weaponName">Glock-18</div>
+      <div id="ammoRow"><span id="ammoClip">20</span><span id="ammoSep">/</span><span id="ammoReserve">120</span></div>
+    </div>
+
+    <div id="crosshair"></div>
+    <div id="hitmarker"></div>
+    <div id="damageOverlay"></div>
+    <div id="flashOverlay"></div>
+    <div id="scopeOverlay" class="hidden">
+      <div class="scope-ring"></div>
+      <div class="scope-h"></div><div class="scope-v"></div>
+    </div>
+
+    <div id="centerMsg"></div>
+    <div id="actionPrompt"></div>
+    <div id="progressWrap" class="hidden"><div id="progressBar"></div><div id="progressLabel"></div></div>
+    <div id="voiceLine"></div>
+  </div>
+
+  <!-- ============ Buy menu ============ -->
+  <div id="buymenu" class="hidden panel">
+    <div class="panel-head">
+      <span>BUY MENU &mdash; DUST II</span>
+      <span id="buyMoney">$800</span>
+      <span class="hint">ESC to close &middot; click or use number keys</span>
+    </div>
+    <div class="buy-body">
+      <div id="buyCats" class="buy-cats"></div>
+      <div id="buyItems" class="buy-items"></div>
+    </div>
+  </div>
+
+  <!-- ============ Scoreboard ============ -->
+  <div id="scoreboard" class="hidden panel">
+    <div class="sb-head"><span id="sbTitle">DUST II</span><span id="sbScores"></span></div>
+    <table id="sbTable">
+      <thead><tr><th>Name</th><th>Money</th><th>K</th><th>D</th><th>A</th><th>Ping</th></tr></thead>
+      <tbody id="sbBodyT"></tbody>
+      <tbody id="sbBodyCT"></tbody>
+    </table>
+  </div>
+
+  <!-- ============ Settings ============ -->
+  <div id="settings" class="hidden panel">
+    <div class="panel-head"><span>SETTINGS</span><span class="hint">ESC to close</span></div>
+    <div class="settings-body" id="settingsBody"></div>
+  </div>
+
+  <!-- ============ Menus ============ -->
+  <div id="menu" class="screen">
+    <div class="menu-inner">
+      <h1>COUNTER&mdash;STRIKE <span>WEB</span></h1>
+      <div class="sub">DUST II &middot; Bomb Defusal &middot; 5 v 5</div>
+      <div class="menu-btns">
+        <button id="btnPlay" class="btn primary">PLAY</button>
+        <button id="btnSettings" class="btn">SETTINGS</button>
+        <button id="btnHelp" class="btn">CONTROLS</button>
+      </div>
+      <div class="menu-foot">Runs entirely in your browser &middot; no install &middot; no download</div>
+    </div>
+  </div>
+
+  <div id="mapselect" class="screen hidden">
+    <div class="menu-inner">
+      <h2>SELECT MAP</h2>
+      <div class="maplist">
+        <div class="mapcard selected">
+          <div class="mapthumb">
+            <svg viewBox="0 0 200 160" width="100%" height="100%" aria-label="Dust II layout">
+              <rect width="200" height="160" fill="#2b2418"/>
+              <g fill="#c8a86a" opacity=".85">
+                <rect x="86" y="118" width="34" height="30"/>            <!-- T spawn -->
+                <rect x="100" y="52" width="26" height="66"/>           <!-- long A -->
+                <rect x="118" y="22" width="34" height="34"/>           <!-- A site -->
+                <rect x="52" y="46" width="26" height="72"/>            <!-- mid -->
+                <rect x="20" y="22" width="30" height="42"/>            <!-- B site -->
+                <rect x="30" y="72" width="22" height="52"/>            <!-- upper tunnels -->
+                <rect x="20" y="60" width="14" height="14"/>            <!-- lower tunnels -->
+                <rect x="60" y="14" width="110" height="12"/>           <!-- CT spawn -->
+                <rect x="78" y="46" width="24" height="8"/>             <!-- catwalk -->
+              </g>
+              <text x="135" y="42" fill="#ffcf6a" font-size="9">A</text>
+              <text x="35" y="46" fill="#ffcf6a" font-size="9">B</text>
+              <text x="110" y="90" fill="#8fa0b8" font-size="7">LONG</text>
+              <text x="58" y="86" fill="#8fa0b8" font-size="7">MID</text>
+              <text x="32" y="102" fill="#8fa0b8" font-size="6">TUN</text>
+              <text x="92" y="140" fill="#e07a5f" font-size="7">T SPAWN</text>
+              <text x="100" y="23" fill="#69b7e0" font-size="7">CT SPAWN</text>
+            </svg>
+          </div>
+          <div class="mapname">de_dust2</div>
+          <div class="mapmeta">Bomb Defusal &middot; Classic &middot; Only map available</div>
+        </div>
+      </div>
+      <div class="menu-btns">
+        <button id="btnMapNext" class="btn primary">CONTINUE</button>
+        <button id="btnMapBack" class="btn">BACK</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="teamselect" class="screen hidden">
+    <div class="menu-inner">
+      <h2>CHOOSE YOUR TEAM</h2>
+      <div class="teamcards">
+        <button class="teamcard t" id="pickT">
+          <div class="teamname">TERRORISTS</div>
+          <div class="teamdesc">Plant the bomb at A or B.<br/>Start with Glock-18 &amp; knife.</div>
+          <div class="teammodel" id="modelT"></div>
+        </button>
+        <button class="teamcard ct" id="pickCT">
+          <div class="teamname">COUNTER-TERRORISTS</div>
+          <div class="teamdesc">Defend the sites, defuse the bomb.<br/>Start with USP-S &amp; knife.</div>
+          <div class="teammodel" id="modelCT"></div>
+        </button>
+      </div>
+      <div class="menu-btns"><button id="btnTeamBack" class="btn">BACK</button></div>
+    </div>
+  </div>
+
+  <div id="help" class="screen hidden">
+    <div class="menu-inner wide">
+      <h2>CONTROLS</h2>
+      <div class="helpgrid" id="helpGrid"></div>
+      <div class="menu-btns"><button id="btnHelpBack" class="btn primary">BACK</button></div>
+    </div>
+  </div>
+
+  <div id="loading" class="screen hidden">
+    <div class="menu-inner">
+      <h2>LOADING DUST II</h2>
+      <div class="loadbar"><div id="loadFill"></div></div>
+      <div id="loadText">Building geometry...</div>
+    </div>
+  </div>
+
+  <div id="matchend" class="screen hidden">
+    <div class="menu-inner">
+      <h2 id="matchResult">TERRORISTS WIN</h2>
+      <div id="matchStats"></div>
+      <div class="menu-btns">
+        <button id="btnAgain" class="btn primary">NEW MATCH</button>
+        <button id="btnQuit" class="btn">MAIN MENU</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="pointerHint" class="hidden">Click to capture mouse</div>
+</div>
+
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
