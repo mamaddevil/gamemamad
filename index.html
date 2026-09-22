@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>گیم ممد</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:Tahoma,'Segoe UI',sans-serif;background:#0b0d16;color:#e9ecf8;min-height:100vh}
+  header{display:flex;align-items:center;gap:14px;padding:18px 22px;max-width:1100px;margin:0 auto}
+  .logo{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;font-weight:800;font-size:20px;
+    background:linear-gradient(135deg,#6c5cff,#3b7bff,#00d4ff);color:#fff;box-shadow:0 8px 22px rgba(108,92,255,.45);flex:none}
+  h1{font-size:20px} .sub{font-size:12px;color:#9aa3c7}
+  .wrap{max-width:1100px;margin:10px auto 40px;padding:0 22px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:14px}
+  .card{background:#151a30;border:1px solid #262e54;border-radius:16px;overflow:hidden;display:flex;flex-direction:column}
+  .card img{width:100%;height:130px;object-fit:cover;background:#1b2140}
+  .card .ph{width:100%;height:130px;display:grid;place-items:center;font-size:34px;background:#1b2140}
+  .card .body{padding:13px;display:flex;flex-direction:column;gap:6px;flex:1}
+  .card h3{font-size:14.5px} .card p{font-size:12px;color:#9aa3c7;line-height:1.5;flex:1}
+  .btns{display:flex;gap:8px;margin-top:6px}
+  .btn{flex:1;text-align:center;padding:9px 10px;border-radius:11px;font-size:12.5px;font-weight:700;cursor:pointer;
+    border:1px solid #262e54;background:#1b2140;color:#e9ecf8;text-decoration:none;transition:.15s}
+  .btn:hover{border-color:#6c5cff;transform:translateY(-1px)}
+  .btn.primary{background:linear-gradient(135deg,#6c5cff,#8b7bff);border:0}
+  .empty{text-align:center;color:#9aa3c7;padding:60px 20px;font-size:14px}
+  .badge{display:inline-block;font-size:10.5px;background:#1b2140;border-radius:7px;padding:2px 7px;color:#9aa3c7}
+</style>
+</head>
+<body>
+<header><div class="logo">گ م</div>
+  <div><h1>گیم ممد</h1><div class="sub">گیم هاب شخصی — بازی‌ها را در مرورگر اجرا کن</div></div></header>
+<main class="wrap">
+  <div id="status" class="empty">در حال بارگذاری بازی‌ها...</div>
+  <div class="grid" id="grid"></div>
+</main>
+<script>
+fetch('games.json?t=' + Date.now())
+  .then(r => r.ok ? r.json() : Promise.reject('خطا'))
+  .then(data => {
+    const games = (data.games || []).filter(g => g.status !== 0 && g.title);
+    const grid = document.getElementById('grid');
+    const status = document.getElementById('status');
+    if (!games.length) { status.textContent = 'هنوز بازی‌ای اضافه نشده است.'; return; }
+    status.textContent = games.length + ' بازی موجود';
+    grid.innerHTML = games.map(g => '<div class="card">'
+      + (g.image_url ? '<img src="' + g.image_url + '" alt="" onerror="this.outerHTML='<div class=ph>🎮</div>'">'
+                      : '<div class="ph">🎮</div>')
+      + '<div class="body"><h3>' + (g.title||'') + '</h3><p>' + (g.description||'') + '</p><div>'
+      + (g.version ? '<span class="badge">نسخه ' + g.version + '</span> ' : '')
+      + (g.file_size ? '<span class="badge">' + g.file_size + '</span>' : '')
+      + '</div><div class="btns">'
+      + (g.play_url ? '<a class="btn primary" href="' + g.play_url + '" target="_blank" rel="noopener">بازی کن</a>' : '')
+      + (g.download_url ? '<a class="btn" href="' + g.download_url + '" download>دانلود</a>' : '')
+      + '</div></div></div>').join('');
+  })
+  .catch(() => { document.getElementById('status').textContent = 'بارگذاری ناموفق بود. بعداً تلاش کنید.'; });
+</script>
+</body>
+</html>
